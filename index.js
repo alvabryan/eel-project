@@ -36,7 +36,24 @@ app.use(
     })
 );
 
+// PROJECT IDEA
+// IOT DEVICE -> SEND DATA SCRIPT (VIDEO, PICTURES, TEXT) -> SERVER API -> IOT DEVICE SCRIPT
+// SEND DATA: CLIENT THAT SITS IOT DEVICE (SCRIPT, NODEJS SERVER) (POSTMAN)
+
+// METRICS MISSING:
+// Network Delay: Record the time it takes for data to travel from IoT devices to the edge server.
+// Packet Delivery Ratio*: Track the number of packets sent and received successfully.
+
+// Missing:
+// Data type: text, Bulk sensor data (Jeffrey)
+// Script that is going to run on IOT DEVICE (Jeffrey, Avinash)
+    // Traverse through all the images and make a request per image
+    // Traverse through text and make request per text
+    // Traverse bulk data and make request per line assuming data is structured in CSV (Make request per object key:value)
+// Server API endpoint processing: Classification Model, Processing for text-upload end-point (Bryan)
+
 // IMPLEMENT FILE UPLOAD ROUTE
+// VIDEO AND PICTURES
 app.post("/image-upload", multParse.single('file'), (req, res) => {
     setTimeout(() => {
         console.log('File uploaded successfully:', req.file.originalname);
@@ -45,6 +62,7 @@ app.post("/image-upload", multParse.single('file'), (req, res) => {
 });
 
 // IMPLEMENT TEXT UPLOAD ROUTE
+// ACCEPT: Just text (plain text, csv line - bulk data)
 app.post("/text-upload", (req, res) => {
     // console.log(req.body);
     // res.send("Received");
@@ -55,8 +73,6 @@ app.post("/text-upload", (req, res) => {
     console.log('Data uploaded successfully:', req.body.data);
     res.send('Data uploaded successfully: ' + req.body.data);
 });
-
-// IMPLEMENT MIDDLEWARE FOR ANALYSIS
 
 // exports.app = functions.https.onRequest(app);
 app.listen(3000, () => {
