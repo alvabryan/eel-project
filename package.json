@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tensorflow-models/mobilenet": "^2.1.1",
+    "@tensorflow/tfjs": "^4.13.0",
+    "@tensorflow/tfjs-node": "^4.13.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dayjs": "^1.11.10",
@@ -21,7 +24,8 @@
     "pino": "^8.16.2",
     "pino-pretty": "^10.2.3",
     "prom-client": "^15.0.0",
-    "response-time": "^2.3.2"
+    "response-time": "^2.3.2",
+    "sentiment": "^5.0.2"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0"
