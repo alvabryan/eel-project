@@ -19,10 +19,10 @@ var multParse = multer();
 
 // Setting up Prometheus metrics for HTTP request duration
 const restResponseTimeHistogram = new client.Histogram({
-    name: 'http_request_duration_milliseconds',
-    help: 'Duration of HTTP requests in milliseconds.',
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds.',
     labelNames: ["method", "route", "status_code"],
-    buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], // Buckets in seconds
+    buckets: [0.000001, 0.00001, 0.0001,0.001,0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], // Buckets in seconds
 })
 
 // Collect default metrics for monitoring
@@ -95,17 +95,20 @@ app.post("/text-upload", (req, res) => {
     }
 
     var sentiment = new Sentiment();
-    var result = sentiment.analyze(req.body.data);
+    var result = sentiment.analyze(data.sentence);
     res.send('Data processed successfully: ' + req.body.data + '\n' + 'Sentiment Score: ' + result.score);
 });
 
 // Endpoint for text upload and sentiment analysis
-app.post("/csv-row-upload", (req, res) => {
+app.post("/csv-row-process", (req, res) => {
     if (!req.body.data) {
         return res.status(400).send('No data was uploaded.');
     }
 
-    res.send('Data processed successfully: ' + req.body.data);
+    var data = req.body.data;
+    var fahrenheit = data.AvgTemperature * 9 / 5 + 32;
+    var celsius = data.AvgTemperature;
+    res.send('Data processed successfully: ' + req.body.data + '\n' + 'Fahrenheit: ' + fahrenheit + '\n' + 'Celsius: ' + celsius);
 });
 
 // Endpoint to serve Prometheus metrics
@@ -114,7 +117,7 @@ app.get("/metrics", async (req, res) => {
     return res.send(await client.register.metrics());
 });
 
-// Start the server on port 3000
+// Start the server on PORT
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
