@@ -95,7 +95,7 @@ app.post("/text-upload", (req, res) => {
     }
 
     var sentiment = new Sentiment();
-    var result = sentiment.analyze(data.sentence);
+    var result = sentiment.analyze(req.body.data.sentence);
     res.send('Data processed successfully: ' + req.body.data + '\n' + 'Sentiment Score: ' + result.score);
 });
 
