@@ -77,7 +77,7 @@ app.post("/image-upload", (req, res) => {
     //     res.status(400).send("Please upload a valid image");
     // }
 
-    console.log(req.file);
+    console.log(req.data);
     res.send('File processed successfully: ');
 
     // const tfimage = tfnode.node.decodeImage(req.file.data);
