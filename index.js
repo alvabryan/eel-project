@@ -34,7 +34,7 @@ const app = express();
 
 // Middleware setup for CORS, body parsing, and URL encoding
 app.use(cors({ origin: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -54,7 +54,7 @@ app.use(
             );
             // Additional logging for image upload route
             if (req.route.path === '/image-upload') {
-                const restReq = { responseTime: time, method: req.method, path: req.route.path, reqFilename: req.body.reqFilename };
+                const restReq = { responseTime: time, method: req.method, path: req.route.path, reqFilename: req.file.originalname };
                 console.log(restReq);
             } else {
                 const restReq = { responseTime: time, method: req.method, path: req.route.path, reqData: req.body.data };
@@ -72,22 +72,45 @@ const imageClassification = async image => {
 }
 
 // Endpoint for image upload and classification
-app.post("/image-upload", multParse.single('file'), (req, res) => {
-    if (!req.body.file) {
-        res.status(400).send("Please upload a valid image");
-    }
+app.post("/image-upload", multParse.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send("Please upload a valid image");
+        }
 
-    const file = req.body.file.data;
+        const file = req.file.buffer; // Assuming the file buffer is available here
 
-    const tfimage = tfnode.node.decodeImage(file);
-    const predictions = imageClassification(tfimage);
-    predictions.then((pred) => {
-        let predictionText = 'Predictions:\n';
-        pred.forEach((tmp) => {
-            predictionText += `${tmp.className}: ${tmp.probability * 100}%\n`
+        // Decode the image using TensorFlow
+        let tfimage;
+        try {
+            tfimage = tfnode.node.decodeImage(file);
+        } catch (error) {
+            console.error("Error decoding image:", error);
+            return res.status(500).send("Error processing the image");
+        }
+
+        // Classify the image
+        let predictions;
+        try {
+            predictions = await imageClassification(tfimage);
+        } catch (error) {
+            console.error("Error classifying image:", error);
+            return res.status(500).send("Error classifying the image");
+        }
+
+        // Format the predictions
+        let predictionText = '\nPredictions:\n';
+        predictions.forEach((pred) => {
+            predictionText += `${pred.className}: ${(pred.probability * 100).toFixed(2)}%\n`;
         });
-        res.send('File processed successfully: ' + req.body.reqFilename + '\n ' + predictionText);
-    });
+
+        console.log('File processed successfully: ' + req.file.originalname + predictionText);
+        res.send('File processed successfully: ' + req.file.originalname + predictionText);
+
+    } catch (error) {
+        console.error("Server error:", error);
+        res.status(500).send("An error occurred on the server");
+    }
 });
 
 // Endpoint for text upload and sentiment analysis
