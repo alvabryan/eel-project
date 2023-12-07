@@ -95,7 +95,7 @@ app.post("/image-upload", multParse.single('file'), async (req, res) => {
             predictions = await imageClassification(tfimage);
         } catch (error) {
             console.error("Error classifying image:", error);
-            return res.status(500).send("Error classifying the image");
+            return res.send("Error classifying the image");
         }
 
         // Format the predictions
