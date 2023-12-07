@@ -14,6 +14,29 @@ const PORT = 3001;
 const mobilenet = require('@tensorflow-models/mobilenet');
 const tfnode = require('@tensorflow/tfjs-node');
 
+let model;
+
+// Load the model when the server starts
+const loadModel = async () => {
+    try {
+        model = await mobilenet.load();
+        console.log("Model loaded successfully");
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
+};
+
+// Updated imageClassification function
+const imageClassification = async (tfimage) => {
+    if (!model) {
+        throw new Error("Model not loaded");
+    }
+    // Use the pre-loaded model for predictions
+    const predictions = await model.classify(tfimage);
+    return predictions;
+};
+
+
 // Initialize multer for file parsing
 var multParse = multer();
 
@@ -63,13 +86,6 @@ app.use(
         }
     })
 );
-
-// Function for classifying images using MobileNet model
-const imageClassification = async image => {
-    const mobilenetModel = await mobilenet.load();
-    const predictions = await mobilenetModel.classify(image);
-    return predictions;
-}
 
 // Endpoint for image upload and classification
 app.post("/image-upload", multParse.single('file'), async (req, res) => {
@@ -144,5 +160,6 @@ app.get("/metrics", async (req, res) => {
 
 // Start the server on PORT
 app.listen(PORT, () => {
+    loadModel();
     console.log(`Server listening on port ${PORT}`);
 });
