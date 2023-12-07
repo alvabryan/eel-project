@@ -72,10 +72,10 @@ const imageClassification = async image => {
 }
 
 // Endpoint for image upload and classification
-app.post("/image-upload", multParse.single('file'), (req, res) => {
-    if (!req.file) {
-        res.status(400).send("Please upload a valid image");
-    }
+app.post("/image-upload", (req, res) => {
+    // if (!req.file) {
+    //     res.status(400).send("Please upload a valid image");
+    // }
 
     console.log(req.file);
     res.send('File processed successfully: ');
