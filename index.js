@@ -77,7 +77,7 @@ app.post("/image-upload", multParse.single('file'), (req, res) => {
         res.status(400).send("Please upload a valid image");
     }
 
-    const tfimage = tfnode.node.decodeImage(req.file.buffer);
+    const tfimage = tfnode.node.decodeImage(req.file.data);
     const predictions = imageClassification(tfimage);
     predictions.then((pred) => {
         let predictionText = 'Predictions:\n';
