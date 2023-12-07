@@ -54,7 +54,7 @@ app.use(
             );
             // Additional logging for image upload route
             if (req.route.path === '/image-upload') {
-                const restReq = { responseTime: time, method: req.method, path: req.route.path, reqFilename: req.file?.originalname };
+                const restReq = { responseTime: time, method: req.method, path: req.route.path, reqFilename: req.body.reqFilename };
                 console.log(restReq);
             } else {
                 const restReq = { responseTime: time, method: req.method, path: req.route.path, reqData: req.body.data };
@@ -72,23 +72,22 @@ const imageClassification = async image => {
 }
 
 // Endpoint for image upload and classification
-app.post("/image-upload", (req, res) => {
-    // if (!req.file) {
-    //     res.status(400).send("Please upload a valid image");
-    // }
+app.post("/image-upload", multParse.single('file'), (req, res) => {
+    if (!req.body.file) {
+        res.status(400).send("Please upload a valid image");
+    }
 
-    console.log(req.data);
-    res.send('File processed successfully: ');
+    const file = req.body.file.data;
 
-    // const tfimage = tfnode.node.decodeImage(req.file.data);
-    // const predictions = imageClassification(tfimage);
-    // predictions.then((pred) => {
-    //     let predictionText = 'Predictions:\n';
-    //     pred.forEach((tmp) => {
-    //         predictionText += `${tmp.className}: ${tmp.probability * 100}%\n`
-    //     });
-    //     res.send('File processed successfully: ' + req.file.originalname + '\n ' + predictionText);
-    // });
+    const tfimage = tfnode.node.decodeImage(file);
+    const predictions = imageClassification(tfimage);
+    predictions.then((pred) => {
+        let predictionText = 'Predictions:\n';
+        pred.forEach((tmp) => {
+            predictionText += `${tmp.className}: ${tmp.probability * 100}%\n`
+        });
+        res.send('File processed successfully: ' + req.body.reqFilename + '\n ' + predictionText);
+    });
 });
 
 // Endpoint for text upload and sentiment analysis
