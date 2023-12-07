@@ -77,15 +77,18 @@ app.post("/image-upload", multParse.single('file'), (req, res) => {
         res.status(400).send("Please upload a valid image");
     }
 
-    const tfimage = tfnode.node.decodeImage(req.file.data);
-    const predictions = imageClassification(tfimage);
-    predictions.then((pred) => {
-        let predictionText = 'Predictions:\n';
-        pred.forEach((tmp) => {
-            predictionText += `${tmp.className}: ${tmp.probability * 100}%\n`
-        });
-        res.send('File processed successfully: ' + req.file.originalname + '\n ' + predictionText);
-    });
+    console.log(req.file);
+    res.send('File processed successfully: ');
+
+    // const tfimage = tfnode.node.decodeImage(req.file.data);
+    // const predictions = imageClassification(tfimage);
+    // predictions.then((pred) => {
+    //     let predictionText = 'Predictions:\n';
+    //     pred.forEach((tmp) => {
+    //         predictionText += `${tmp.className}: ${tmp.probability * 100}%\n`
+    //     });
+    //     res.send('File processed successfully: ' + req.file.originalname + '\n ' + predictionText);
+    // });
 });
 
 // Endpoint for text upload and sentiment analysis
